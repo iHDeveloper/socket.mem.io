@@ -1,8 +1,10 @@
+import { EventEmitter } from "events";
 import * as SocketIO from "socket.io";
 
 export class Server {
     public readonly options: ServerOptions;
     private server: SocketIO.Server;
+    private emitter: EventEmitter;
 
     constructor(srv?: any, options?: ServerOptions) {
         if (options === undefined) {
@@ -11,6 +13,7 @@ export class Server {
             this.options = options;
         }
         this.server = SocketIO.default(srv, this.options);
+        this.emitter = new EventEmitter();
     }
 
     public listen(port?: number): void {
