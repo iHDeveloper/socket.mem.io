@@ -4,13 +4,13 @@ export class Server {
     public readonly options: ServerOptions;
     private server: SocketIO.Server;
 
-    constructor(options?: ServerOptions) {
+    constructor(srv?: any, options?: ServerOptions) {
         if (options === undefined) {
             this.options = new ServerOptions();
         } else {
             this.options = options;
         }
-        this.server = SocketIO.default(this.options);
+        this.server = SocketIO.default(srv, this.options);
     }
 
     public listen(port?: number): void {
