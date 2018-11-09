@@ -25,7 +25,7 @@ export class Server {
         this.server.listen(port, this.options);
     }
 
-    public emit(event: string, ...args: any[]): this{
+    public emit(event: string, ...args: any[]): this {
         this.emitter.emit(event, args);
         return this;
     }
