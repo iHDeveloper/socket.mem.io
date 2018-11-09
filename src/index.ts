@@ -24,6 +24,16 @@ export class Server {
         }
         this.server.listen(port, this.options);
     }
+
+    public emit(event: string, ...args: any[]): this{
+        this.emitter.emit(event, args);
+        return this;
+    }
+
+    public on(event: string, listener: (...args: any[]) => void): this {
+        this.emitter.on(event, listener);
+        return this;
+    }
 }
 
 export class ServerOptions implements SocketIO.ServerOptions {
