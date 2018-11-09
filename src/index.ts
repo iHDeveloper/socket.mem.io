@@ -32,6 +32,9 @@ export class Server {
 
     public on(event: string, listener: (...args: any[]) => void): this {
         this.emitter.on(event, listener);
+        this.server.on(event, (args: any) => {
+            this.emitter.emit(event, args);
+        });
         return this;
     }
 }
