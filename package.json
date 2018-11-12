@@ -1,35 +1,36 @@
 {
-  "name": "socket-mem-io",
-  "version": "0.0.0",
-  "description": "It's a package that helps you to make a static server which helps you to never duplicate any data.",
-  "main": "index.js",
-  "scripts": {
-    "test": "node index.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/iHDeveloper/socket.mem.io.git"
-  },
-  "keywords": [
-    "Static",
-    "Server",
-    "Nodejs",
-    "NPM",
-    "Socket.io",
-    "Socket.mem.io"
-  ],
-  "author": "iHDeveloper",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/iHDeveloper/socket.mem.io/issues"
-  },
-  "homepage": "https://github.com/iHDeveloper/socket.mem.io#readme",
-  "dependencies": {
-    "crypto-js": "^3.1.9-1",
-    "socket.io": "^2.1.1"
-  },
-  "devDependencies": {
-    "@types/crypto-js": "^3.1.43",
-    "@types/socket.io": "^2.1.0"
-  }
+    "name": "socket-mem-io",
+    "version": "0.0.0",
+    "description": "It's a package that helps you to make a static server which helps you to never duplicate any data.",
+    "main": "index.js",
+    "scripts": {
+        "test": "node index.js",
+        "build": "tsc -p ."
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/iHDeveloper/socket.mem.io.git"
+    },
+    "keywords": [
+        "Static",
+        "Server",
+        "Nodejs",
+        "NPM",
+        "Socket.io",
+        "Socket.mem.io"
+    ],
+    "author": "iHDeveloper",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/iHDeveloper/socket.mem.io/issues"
+    },
+    "homepage": "https://github.com/iHDeveloper/socket.mem.io#readme",
+    "dependencies": {
+        "crypto-js": "^3.1.9-1",
+        "socket.io": "^2.1.1"
+    },
+    "devDependencies": {
+        "@types/crypto-js": "^3.1.43",
+        "@types/socket.io": "^2.1.0"
+    }
 }
