@@ -36,6 +36,11 @@ export class Server {
         this.emitter.on(event, listener);
         const exist: boolean = this.has(this.eventsArray, event);
         if (!exist) {
+            if (event === "connection") {
+                this.server.on(event, (socket: SocketIO.Socket) => {
+                    this.emitter.emit(event, socket);
+                });
+            }
             this.server.on(event, (args: any) => {
                 this.emitter.emit(event, args);
             });
