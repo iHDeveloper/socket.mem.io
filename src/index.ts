@@ -40,10 +40,12 @@ export class Server {
                 this.server.on(event, (socket: SocketIO.Socket) => {
                     this.emitter.emit(event, socket);
                 });
+            } else {
+                this.server.on(event, (args: any) => {
+                    this.emitter.emit(event, args);
+                });
             }
-            this.server.on(event, (args: any) => {
-                this.emitter.emit(event, args);
-            });
+            this.eventsArray.push(event);
         }
         return this;
     }
