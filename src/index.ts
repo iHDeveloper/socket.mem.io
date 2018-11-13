@@ -5,6 +5,7 @@ export class Server {
     public readonly options: ServerOptions;
     private server: SocketIO.Server;
     private emitter: EventEmitter;
+    private eventsArray: string[];
 
     constructor(srv?: any, options?: ServerOptions) {
         if (options === undefined) {
@@ -14,6 +15,7 @@ export class Server {
         }
         this.server = SocketIO.default(srv, this.options);
         this.emitter = new EventEmitter();
+        this.eventsArray = [];
     }
 
     public listen(port?: number): void {
@@ -32,10 +34,22 @@ export class Server {
 
     public on(event: string, listener: (...args: any[]) => void): this {
         this.emitter.on(event, listener);
-        this.server.on(event, (args: any) => {
-            this.emitter.emit(event, args);
-        });
+        const exist: boolean = this.has(this.eventsArray, event);
+        if (!exist) {
+            this.server.on(event, (args: any) => {
+                this.emitter.emit(event, args);
+            });
+        }
         return this;
+    }
+
+    private has(array: string[], toFind: string) {
+        for (const i of array) {
+            if (i === toFind) {
+                return true;
+            }
+        }
+        return false;
     }
 }
 
