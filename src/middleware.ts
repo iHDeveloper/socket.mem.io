@@ -9,9 +9,15 @@ export class Middleware {
         this.memoryKeyReader = new MemoryKeyReader();
     }
 
-    public isKey(content: string): boolean {
-        if (content.startsWith("0x")) {
-            const key: string = content.substr(3).replace("-", "");
+    public isKey(content: any[] | string): boolean {
+        let contentAsString: string;
+        if (typeof content === typeof String) {
+            contentAsString = content as string;
+        } else {
+            contentAsString = "" + content;
+        }
+        if (contentAsString.startsWith("0x")) {
+            const key: string = contentAsString.substr(3).replace("-", "");
             const exist: boolean = this.memoryManager.has(key);
             if (exist) {
                 return true;
@@ -45,11 +51,17 @@ export class Middleware {
         return known;
     }
 
-    public loadKey(content: any[]): string {
+    public loadKey(content: any[] | string): string {
+        if (typeof content === typeof String) {
+            if (this.isKey(content as string)) {
+                return content as string;
+            }
+        }
         const contentAsString: string = "" + content;
-        const uuid = require("uuid/v3");
+        let uuid = require("uuid/v3");
         const namespace = "1b671a64-40d5-491e-99b0-da01ff1f3341";
         const key = uuid(contentAsString, namespace);
+        uuid = undefined;
         return key;
     }
 
