@@ -1,9 +1,13 @@
 import { EventEmitter } from "events";
 import * as SocketIO from "socket.io";
+import { MemoryKeyModule, MemoryKeyReader, MemoryManager } from "./memory";
+import { Middleware } from "./middleware";
 import { Until } from "./until";
 
 export class Server extends Until {
     public readonly options: ServerOptions;
+    public middleware: Middleware;
+    public memoryManager: MemoryManager;
     private server: SocketIO.Server;
     private emitter: EventEmitter;
     private eventsArray: string[];
@@ -15,6 +19,8 @@ export class Server extends Until {
         } else {
             this.options = options;
         }
+        this.memoryManager = new MemoryManager();
+        this.middleware = new Middleware(this.memoryManager);
         this.server = SocketIO.default(srv, this.options);
         this.emitter = new EventEmitter();
         this.eventsArray = [];
@@ -40,7 +46,7 @@ export class Server extends Until {
         if (!exist) {
             if (event === "connection") {
                 this.server.on(event, (socketIO: SocketIO.Socket) => {
-                    const socket: Socket = new Socket(socketIO);
+                    const socket: Socket = new Socket(this, socketIO);
                     this.emitter.emit(event, socket);
                 });
             } else {
@@ -55,18 +61,47 @@ export class Server extends Until {
 }
 
 export class Socket extends Until {
+    private server: Server;
     private socket: SocketIO.Socket;
     private emitter: EventEmitter;
     private eventsArray: string[];
 
-    constructor(socket: SocketIO.Socket) {
+    constructor(server: Server, socket: SocketIO.Socket) {
         super();
+        this.server = server;
         this.socket = socket;
         this.emitter = new EventEmitter();
         this.eventsArray = [];
     }
 
     public emit(event: string, ...args: any[]): this {
+        const content: string = "" + args;
+        const middleware: Middleware = this.server.middleware;
+        const loadedKey: string = middleware.loadKey(content);
+        if (middleware.isKey(loadedKey)) {
+            if (middleware.isKnownForSocket(this.socket.id, loadedKey)) {
+                this.socket.emit(event, loadedKey);
+            } else {
+                this.socket.emit(event, args);
+                const memoryKeyReader: MemoryKeyReader = new MemoryKeyReader();
+                memoryKeyReader.read(this.server.memoryManager.remember(loadedKey));
+                memoryKeyReader.add(this.socket.id);
+                const data: string = memoryKeyReader.write();
+                memoryKeyReader.close();
+                this.server.memoryManager.remember(loadedKey, data);
+            }
+        } else {
+            this.socket.emit(event, args);
+            const memoryKeyReader: MemoryKeyReader = new MemoryKeyReader();
+            const module: MemoryKeyModule = new MemoryKeyModule();
+            module.content = "" + args;
+            module.ids = [];
+            memoryKeyReader.read(JSON.stringify(module));
+            memoryKeyReader.add(this.socket.id);
+            const data: string = memoryKeyReader.write();
+            memoryKeyReader.close();
+            this.server.memoryManager.remember(loadedKey, data);
+        }
         this.socket.emit(event, args);
         return this;
     }
@@ -76,6 +111,30 @@ export class Socket extends Until {
         const exist: boolean = this.has(this.eventsArray, event);
         if (!exist) {
             this.socket.on(event, (args: any[]) => {
+                const content: string = "" + args;
+                const middleware: Middleware = this.server.middleware;
+                const loadedKey: string = middleware.loadKey(content);
+                if (middleware.isKey(loadedKey)) {
+                    const memoryKeyReader: MemoryKeyReader = new MemoryKeyReader();
+                    memoryKeyReader.read(this.server.memoryManager.remember(loadedKey));
+                    const contentFromMemory: string | undefined = memoryKeyReader.content;
+                    memoryKeyReader.close();
+                    if (contentFromMemory === undefined) {
+                        this.emitter.emit(event, args);
+                    }
+                    this.emitter.emit(event, contentFromMemory);
+                } else {
+                    this.emitter.emit(event, args);
+                    const module: MemoryKeyModule = new MemoryKeyModule();
+                    module.ids = [];
+                    module.content = content;
+                    const memoryKeyReader: MemoryKeyReader = new MemoryKeyReader();
+                    memoryKeyReader.read(JSON.stringify(module));
+                    memoryKeyReader.add(this.socket.id);
+                    const data: string = memoryKeyReader.write();
+                    memoryKeyReader.close();
+                    this.server.memoryManager.remember(loadedKey, data);
+                }
                 this.emitter.emit(event, args);
             });
             this.eventsArray.push(event);
