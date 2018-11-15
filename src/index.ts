@@ -53,6 +53,29 @@ export class Server extends Until {
     }
 }
 
+export class Socket {
+    private socket: SocketIO.Socket;
+    private emitter: EventEmitter;
+
+    constructor(socket: SocketIO.Socket) {
+        this.socket = socket;
+        this.emitter = new EventEmitter();
+    }
+
+    public emit(event: string, ...args: any[]): this {
+        this.socket.emit(event, args);
+        return this;
+    }
+
+    public on(event: string, listener: (...args: any[]) => void): this {
+        this.emitter.on(event, listener);
+        this.socket.on(event, (args: any[]) => {
+            this.emitter.emit(event, args);
+        });
+        return this;
+    }
+}
+
 export class ServerOptions implements SocketIO.ServerOptions {
     public port: number = 8000;
     public path: string = "/socket.io";
