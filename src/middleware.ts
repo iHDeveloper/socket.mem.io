@@ -60,7 +60,7 @@ export class Middleware {
         const contentAsString: string = "" + content;
         let uuid = require("uuid/v3");
         const namespace = "1b671a64-40d5-491e-99b0-da01ff1f3341";
-        const key = uuid(contentAsString, namespace);
+        const key = "0x" + (uuid(contentAsString, namespace) as string).replace("-", "");
         uuid = undefined;
         return key;
     }
