@@ -1,13 +1,15 @@
 import { EventEmitter } from "events";
 import * as SocketIO from "socket.io";
+import { Until } from "./until";
 
-export class Server {
+export class Server extends Until {
     public readonly options: ServerOptions;
     private server: SocketIO.Server;
     private emitter: EventEmitter;
     private eventsArray: string[];
 
     constructor(srv?: any, options?: ServerOptions) {
+        super();
         if (options === undefined) {
             this.options = new ServerOptions();
         } else {
