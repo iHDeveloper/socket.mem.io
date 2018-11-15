@@ -53,13 +53,16 @@ export class Server extends Until {
     }
 }
 
-export class Socket {
+export class Socket extends Until {
     private socket: SocketIO.Socket;
     private emitter: EventEmitter;
+    private eventsArray: string[];
 
     constructor(socket: SocketIO.Socket) {
+        super();
         this.socket = socket;
         this.emitter = new EventEmitter();
+        this.eventsArray = [];
     }
 
     public emit(event: string, ...args: any[]): this {
@@ -69,9 +72,13 @@ export class Socket {
 
     public on(event: string, listener: (...args: any[]) => void): this {
         this.emitter.on(event, listener);
-        this.socket.on(event, (args: any[]) => {
-            this.emitter.emit(event, args);
-        });
+        const exist: boolean = this.has(this.eventsArray, event);
+        if (!exist) {
+            this.socket.on(event, (args: any[]) => {
+                this.emitter.emit(event, args);
+            });
+            this.eventsArray.push(event);
+        }
         return this;
     }
 }
