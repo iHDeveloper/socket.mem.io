@@ -49,15 +49,6 @@ export class Server {
         }
         return this;
     }
-
-    private has(array: string[], toFind: string) {
-        for (const i of array) {
-            if (i === toFind) {
-                return true;
-            }
-        }
-        return false;
-    }
 }
 
 export class ServerOptions implements SocketIO.ServerOptions {
