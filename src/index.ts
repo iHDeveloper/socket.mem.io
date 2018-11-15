@@ -39,7 +39,8 @@ export class Server extends Until {
         const exist: boolean = this.has(this.eventsArray, event);
         if (!exist) {
             if (event === "connection") {
-                this.server.on(event, (socket: SocketIO.Socket) => {
+                this.server.on(event, (socketIO: SocketIO.Socket) => {
+                    const socket: Socket = new Socket(socketIO);
                     this.emitter.emit(event, socket);
                 });
             } else {
