@@ -64,6 +64,13 @@ export class MemoryKeyReader {
         }
         return this;
     }
+
+    public write(): string {
+        const module: MemoryKeyModule = new MemoryKeyModule();
+        module.ids = this.ids;
+        module.content = this.content;
+        return JSON.stringify(module);
+    }
 }
 
 export class MemoryManager {
